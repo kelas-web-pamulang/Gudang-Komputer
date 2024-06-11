@@ -14,13 +14,18 @@
         $db = new ConfigDB();
         $conn = $db->connect();
 
+        $productId = $_GET['id'];
+        $result = $db->select("products", ['AND id=' => $productId]);
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $name = $_POST['name'];
             $price = $_POST['price'];
             $category = $_POST['id_category'];
             $supplier = $_POST['id_supplier'];
-            $stock = $_POST['stock'];
-            $productId = $_GET['id'];
+            $addStock = $_POST['add_stock'];
+
+            $currentStock = $result[0]['stock'];
+            $newStock = $currentStock + $addStock;
 
             $conn->begin_transaction();
             try {
@@ -29,7 +34,7 @@
                             price = '$price', 
                             id_category = '$category', 
                             id_supplier = '$supplier', 
-                            stock = '$stock' 
+                            stock = '$newStock' 
                           WHERE id = $productId";
 
                 if ($conn->query($query) === TRUE) {
@@ -44,9 +49,8 @@
             }
 
             $result = $db->select("products", ['AND id=' => $productId]);
-        } else {
-            $result = $db->select("products", ['AND id=' => $_GET['id']]);
-        }
+        } 
+
     ?>
     <div class="container">
         <h1 class="text-center mt-5">Ubah Data</h1>
@@ -85,8 +89,13 @@
             </div>
             <div class="form-group">
                 <label for="stockInput">Stock</label>
-                <input type="number" class="form-control" id="stockInput" name="stock" placeholder="Enter Stock" required value="<?php echo $result[0]['stock'] ?>">
+                <input type="number" class="form-control" id="stockInput" name="current_stock" placeholder="Current Stock" readonly value="<?php echo $result[0]['stock'] ?>">
             </div>
+            <div class="form-group">
+                <label for="addStockInput">Tambah Stock</label>
+                <input type="number" class="form-control" id="addStockInput" name="add_stock" placeholder="0" required>
+            </div>
+
             <button type="submit" class="btn btn-primary">Submit</button>
             <a href="index.php" class="btn btn-info">Kembali</a>
         </form>

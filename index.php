@@ -1,27 +1,43 @@
+<?php
+session_start();
+
+// Periksa apakah pengguna sudah login atau belum
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+?>
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>List Product</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
+            background-image: url('https://images.pexels.com/photos/3945655/pexels-photo-3945655.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
         }
         .container {
             max-width: 1200px;
             margin: 50px auto;
             padding: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.9); /* Added transparency to show the background */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
         }
         h1 {
             text-align: center;
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            font-weight: bold;
         }
         .search-bar {
             display: flex;
@@ -34,42 +50,53 @@
             align-items: center;
         }
         .search-bar input,
-        .search-bar select,
-        .search-bar button {
+        .search-bar select {
             margin-right: 10px;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            flex: 1;
         }
         .search-bar button {
-            background-color: #28a745;
-            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
             border: none;
             cursor: pointer;
         }
-        .search-bar a button {
+        .btn-search {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-add {
             background-color: #007bff;
             color: white;
-            border: none;
-            cursor: pointer;
+        }
+        .btn-transaksi {
+            background-color: #ffc107;
+            color: white;
+        }
+        .btn-logout {
+            background-color: #dc3545;
+            color: white;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
+        table th, table td {
+            padding: 15px;
             text-align: left;
         }
-        th {
+        table th {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+        table tr:nth-child(even) {
             background-color: #f2f2f2;
         }
         .btn {
-            padding: 5px 10px;
+            padding: 10px 15px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
@@ -81,6 +108,9 @@
         .btn-danger {
             background-color: #dc3545;
             color: white;
+        }
+        .alert {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -95,11 +125,13 @@
                     <option value="name">Supplier</option>
                     <option value="category">Category</option>
                 </select>
-                <button type="submit">Cari</button>
+                <button type="submit" class="btn btn-search">Cari</button>
             </form>
-            <a href="insert.php"><button>Tambah Data</button></a>
+            <a href="insert.php"><button class="btn btn-add">Tambah Data</button></a>
+            <a href="transaksi.php"><button class="btn btn-transaksi">Transaksi</button></a>
+            <a href="logout.php"><button class="btn btn-logout">Logout</button></a>
         </div>
-        <table>
+        <table class="table table-striped table-hover">
             <thead>
                 <tr>
                     <th>No</th>
@@ -123,7 +155,6 @@
                 $db = new ConfigDB();
                 $conn = $db->connect();
 
-                // Proses delete jika ada parameter 'delete'
                 if (isset($_GET['delete'])) {
                     $deleteId = (int)$_GET['delete'];
                     $conn->begin_transaction();
@@ -141,14 +172,12 @@
                     }
                 }
 
-                // Kondisi untuk pencarian
                 $searchCondition = "";
                 if (isset($_GET['search'])) {
                     $search = $conn->real_escape_string($_GET['search']);
                     $searchCondition = "AND (a.name LIKE '%$search%' OR b.name LIKE '%$search%' OR c.name LIKE '%$search%')";
                 }
 
-                // Query untuk mengambil data produk beserta kategori dan supplier
                 $query = "
                 SELECT a.id, a.name, a.price, a.stock, a.created_at, b.name AS category_name, c.name AS supplier_name
                 FROM products a 
@@ -160,7 +189,6 @@
                 $result = $conn->query($query);
 
                 if ($result->num_rows > 0) {
-                    // Loop melalui hasil query dan tampilkan data
                     foreach ($result as $key => $row) {
                         echo "<tr>";
                         echo "<td>".($key + 1)."</td>";
@@ -183,5 +211,6 @@
             </tbody>
         </table>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+z2gtmGIKwUIA6ztJ7Fzo2+fQutL4" crossorigin="anonymous"></script>
 </body>
 </html>

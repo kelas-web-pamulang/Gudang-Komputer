@@ -64,7 +64,7 @@
 
         <?php
             if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                $name = $_POST['name'];
+                $name = Trim(Htmlentities($_POST['name']));
                 $price = $_POST['price'];
                 $category = $_POST['category'];
                 $supplier = $_POST['id_supplier'];
