@@ -12,13 +12,18 @@
 
         require_once 'vendor/autoload.php';
 
-\Sentry\init([
-  'dsn' => 'https://8fe5bdc8b306ed66f97ce9fbcb34beed@o4507456514949120.ingest.us.sentry.io/4507456516653056',
-  // Specify a fixed sample rate
-  'traces_sample_rate' => 1.0,
-  // Set a sampling rate for profiling - this is relative to traces_sample_rate
-  'profiles_sample_rate' => 1.0,
+    \Sentry\init([
+    'dsn' => 'https://8fe5bdc8b306ed66f97ce9fbcb34beed@o4507456514949120.ingest.us.sentry.io/4507456516653056',
+    // Specify a fixed sample rate
+    'traces_sample_rate' => 1.0,
+    // Set a sampling rate for profiling - this is relative to traces_sample_rate
+    'profiles_sample_rate' => 1.0,
 ]);
+
+ini_set('display_errors', '0');
+            ini_set('display_startup_errors', '1');
+            error_reporting(E_ALL);
+
         require_once 'config_db.php';
 
         $db = new ConfigDB();
