@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -64,6 +64,15 @@
             <p>Belum punya akun? <a href="register.php">Daftar sekarang</a></p>
         </div>
         <?php
+            require_once 'vendor/autoload.php';
+
+\Sentry\init([
+  'dsn' => 'https://8fe5bdc8b306ed66f97ce9fbcb34beed@o4507456514949120.ingest.us.sentry.io/4507456516653056',
+  // Specify a fixed sample rate
+  'traces_sample_rate' => 1.0,
+  // Set a sampling rate for profiling - this is relative to traces_sample_rate
+  'profiles_sample_rate' => 1.0,
+]);
             ini_set('display_errors', '1');
             ini_set('display_startup_errors', '1');
             error_reporting(E_ALL);
@@ -77,38 +86,63 @@
 
             require_once 'config_db.php';
 
-            $db = new ConfigDB();
-            $conn = $db->connect();
+            try {
+                $db = new ConfigDB();
+                $conn = $db->connect();
 
-            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                $email = $_POST['email'];
-                $password = $_POST['password'];
+                // function checkNum($number) {
+                //     if($number>1) {
+                //       throw new Exception("Value must be 1 or below");
+                //     }
+                //     return true;
+                //   }
+                // function logError($error) {
+                //     error_log($error, 3, 'error.log');
+                //  }
+                //  try {
+                //     echo checkNum(2);    
+                // } catch (Exception $e) {
+                //     logError($e->getMessage());
+                //     echo 'Error : '.$e->getMessage();
+                // }
+                    
+                // echo 'Finish';
 
-                $query = "SELECT id, email, full_name, password FROM users WHERE email = ?";
-                $stmt = $conn->prepare($query);
-                $stmt->bind_param("s", $email);
-                $stmt->execute();
-                $result = $stmt->get_result();
+                if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                    $email = $_POST['email'];
+                    $password = $_POST['password'];
 
-                if ($result->num_rows > 0) {
-                    $user = $result->fetch_assoc();
-                    if (password_verify($password, $user['password'])) {
-                        $_SESSION['login'] = true;
-                        $_SESSION['user_id'] = $user['id'];
-                        $_SESSION['user_email'] = $user['email'];
-                        $_SESSION['user_name'] = $user['full_name'];
-                        header('Location: index.php');
-                        exit();
-                    } else {
-                        echo "<div class='alert alert-danger mt-3' role='alert'>User/Password is incorrect</div>";
+                    $query = "SELECT id, email, full_name, password FROM users WHERE email = ?";
+                    $stmt = $conn->prepare($query);
+                    if (!$stmt) {
+                        throw new Exception("Persiapan pernyataan gagal: " . $conn->error);
                     }
-                } else {
-                    echo "<div class='alert alert-danger mt-3' role='alert'>User/Password is incorrect</div>";
-                }
-                $stmt->close();
-            }
+                    $stmt->bind_param("s", $email);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
 
-            $conn->close();
+                    if ($result->num_rows > 0) {
+                        $user = $result->fetch_assoc();
+                        if (password_verify($password, $user['password'])) {
+                            $_SESSION['login'] = true;
+                            $_SESSION['user_id'] = $user['id'];
+                            $_SESSION['user_email'] = $user['email'];
+                            $_SESSION['user_name'] = $user['full_name'];
+                            header('Location: index.php');
+                            exit();
+                        } else {
+                            echo "<div class='alert alert-danger mt-3' role='alert'>Email atau Password salah</div>";
+                        }
+                    } else {
+                        echo "<div class='alert alert-danger mt-3' role='alert'>Email atau Password salah</div>";
+                    }
+                    $stmt->close();
+                }
+
+                $conn->close();
+            } catch (Exception $e) {
+                echo "<div class='alert alert-danger mt-3' role='alert'>Terjadi kesalahan: " . $e->getMessage() . "</div>";
+            }
         ?>
     </div>
 </body>

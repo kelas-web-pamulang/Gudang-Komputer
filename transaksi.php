@@ -1,12 +1,41 @@
 <?php
+require_once 'vendor/autoload.php';
+
+\Sentry\init([
+  'dsn' => 'https://8fe5bdc8b306ed66f97ce9fbcb34beed@o4507456514949120.ingest.us.sentry.io/4507456516653056',
+  // Specify a fixed sample rate
+  'traces_sample_rate' => 1.0,
+  // Set a sampling rate for profiling - this is relative to traces_sample_rate
+  'profiles_sample_rate' => 1.0,
+]);
+
+
 session_start();
 require_once 'config_db.php';
 
 $db = new ConfigDB();
 $conn = $db->connect();
 
+// function checkNum($number) {
+                //     if($number>1) {
+                //       throw new Exception("Value must be 1 or below");
+                //     }
+                //     return true;
+                //   }
+                // function logError($error) {
+                //     error_log($error, 3, 'error.log');
+                //  }
+                //  try {
+                //     echo checkNum(2);    
+                // } catch (Exception $e) {
+                //     logError($e->getMessage());
+                //     echo 'Error : '.$e->getMessage();
+                // }
+                    
+                // echo 'Finish';
+
 // Handle new transaction submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buyer_name'])) {
     $buyer_name = $_POST['buyer_name'];
     $products = $_POST['products'];
     $total_amount = 0;
@@ -82,14 +111,24 @@ while ($row = $product_result->fetch_assoc()) {
 }
 
 // Fetch transactions to display
+$search_query = "";
+if (isset($_GET['search'])) {
+    $search_query = $_GET['search'];
+}
 $transaction_query = "SELECT t.id, t.product_id, t.quantity, t.buyer_name, t.created_at, p.name AS product_name, (t.quantity * p.price) AS total_price 
                       FROM transactions t 
-                      JOIN products p ON t.product_id = p.id";
-$transaction_result = $conn->query($transaction_query);
+                      JOIN products p ON t.product_id = p.id
+                      WHERE t.buyer_name LIKE ? OR p.name LIKE ?";
+$search_param = "%" . $search_query . "%";
+$stmt = $conn->prepare($transaction_query);
+$stmt->bind_param("ss", $search_param, $search_param);
+$stmt->execute();
+$transaction_result = $stmt->get_result();
 $transactions = [];
 while ($row = $transaction_result->fetch_assoc()) {
     $transactions[] = $row;
 }
+$stmt->close();
 
 // Fetch total shopping
 $total_shopping_query = "SELECT SUM(t.quantity * p.price) AS total_shopping FROM transactions t JOIN products p ON t.product_id = p.id";
@@ -103,7 +142,7 @@ $conn->close();
 ?>
 
 <!doctype html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -111,6 +150,7 @@ $conn->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
+            background-image: url('https://images.pexels.com/photos/1420709/pexels-photo-1420709.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
             background-color: #f8f9fa;
         }
         .container {
@@ -136,6 +176,10 @@ $conn->close();
         <h1>Transaksi</h1>
         <div class="btn-container">
             <a href="index.php" class="btn btn-primary">Kembali ke Daftar Produk</a>
+            <form action="transaksi.php" method="get" class="d-flex">
+                <input type="text" name="search" class="form-control" placeholder="Cari Transaksi" value="<?php echo htmlspecialchars($search_query); ?>">
+                <button type="submit" class="btn btn-secondary ms-2">Cari</button>
+            </form>
         </div>
         
         <?php if (isset($_SESSION['message'])): ?>
@@ -194,7 +238,7 @@ $conn->close();
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="6" class="text-center">No Transactions Found</td>
+                        <td colspan="6" class="text-center">Tidak ada transaksi ditemukan</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
