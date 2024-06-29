@@ -1,5 +1,12 @@
 <?php
-// require_once 'vendor/autoload.php';
+require_once 'vendor/autoload.php';
+\Sentry\init([
+    'dsn' => 'https://8fe5bdc8b306ed66f97ce9fbcb34beed@o4507456514949120.ingest.us.sentry.io/4507456516653056',
+    // Specify a fixed sample rate
+    'traces_sample_rate' => 1.0,
+    // Set a sampling rate for profiling - this is relative to traces_sample_rate
+    'profiles_sample_rate' => 1.0,
+  ]);
 session_start();
 
 // Periksa apakah pengguna sudah login atau belum
@@ -8,13 +15,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-\Sentry\init([
-    'dsn' => 'https://8fe5bdc8b306ed66f97ce9fbcb34beed@o4507456514949120.ingest.us.sentry.io/4507456516653056',
-    // Specify a fixed sample rate
-    'traces_sample_rate' => 1.0,
-    // Set a sampling rate for profiling - this is relative to traces_sample_rate
-    'profiles_sample_rate' => 1.0,
-  ]);
+
 ?>
 <!doctype html>
 <html lang="en">
