@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -68,68 +68,48 @@
             <p>Sudah punya akun? <a href="login.php">Masuk sekarang</a></p>
         </div>
         <?php
-            require_once 'vendor/autoload.php';
-
-\Sentry\init([
-  'dsn' => 'https://8fe5bdc8b306ed66f97ce9fbcb34beed@o4507456514949120.ingest.us.sentry.io/4507456516653056',
-  // Specify a fixed sample rate
-  'traces_sample_rate' => 1.0,
-  // Set a sampling rate for profiling - this is relative to traces_sample_rate
-  'profiles_sample_rate' => 1.0,
-]);
-
-            ini_set('display_errors', '0');
+            ini_set('display_errors', '1');
             ini_set('display_startup_errors', '1');
             error_reporting(E_ALL);
 
             require_once 'config_db.php';
 
-            try {
-                $db = new ConfigDB();
-                $conn = $db->connect();
+            $db = new ConfigDB();
+            $conn = $db->connect();
 
-                if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                    $name = $_POST['name'];
-                    $email = $_POST['email'];
-                    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-                    $createdAt = date('Y-m-d H:i:s');
+            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                $name = $_POST['name'];
+                $email = $_POST['email'];
+                $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+                $createdAt = date('Y-m-d H:i:s');
 
-                    // Pengecekan apakah email sudah terdaftar
-                    $checkEmailQuery = "SELECT * FROM users WHERE email = ?";
-                    $checkStmt = $conn->prepare($checkEmailQuery);
-                    if (!$checkStmt) {
-                        throw new Exception("Persiapan pernyataan gagal: " . $conn->error);
-                    }
-                    $checkStmt->bind_param("s", $email);
-                    $checkStmt->execute();
-                    $result = $checkStmt->get_result();
+                // Pengecekan apakah email sudah terdaftar
+                $checkEmailQuery = "SELECT * FROM users WHERE email = ?";
+                $checkStmt = $conn->prepare($checkEmailQuery);
+                $checkStmt->bind_param("s", $email);
+                $checkStmt->execute();
+                $result = $checkStmt->get_result();
 
-                    if ($result->num_rows > 0) {
-                        echo "<div class='alert alert-danger mt-3' role='alert'>Email sudah terdaftar</div>";
+                if ($result->num_rows > 0) {
+                    echo "<div class='alert alert-danger mt-3' role='alert'>Email sudah terdaftar</div>";
+                } else {
+                    // Melakukan pendaftaran jika email belum terdaftar
+                    $stmt = $conn->prepare("INSERT INTO users (email, full_name, password, role, created_at) VALUES (?, ?, ?, 'admin', ?)");
+                    $stmt->bind_param("ssss", $email, $name, $password, $createdAt);
+
+                    if ($stmt->execute()) {
+                        echo "<div class='alert alert-success mt-3' role='alert'>Data inserted successfully</div>";
                     } else {
-                        // Melakukan pendaftaran jika email belum terdaftar
-                        $stmt = $conn->prepare("INSERT INTO users (email, full_name, password, role, created_at) VALUES (?, ?, ?, 'admin', ?)");
-                        if (!$stmt) {
-                            throw new Exception("Persiapan pernyataan gagal: " . $conn->error);
-                        }
-                        $stmt->bind_param("ssss", $email, $name, $password, $createdAt);
-
-                        if ($stmt->execute()) {
-                            echo "<div class='alert alert-success mt-3' role='alert'>Data berhasil dimasukkan</div>";
-                        } else {
-                            throw new Exception("Eksekusi pernyataan gagal: " . $stmt->error);
-                        }
-
-                        $stmt->close();
+                        echo "<div class='alert alert-danger mt-3' role='alert'>Error: " . $stmt->error . "</div>";
                     }
 
-                    $checkStmt->close();
+                    $stmt->close();
                 }
 
-                $conn->close();
-            } catch (Exception $e) {
-                echo "<div class='alert alert-danger mt-3' role='alert'>Terjadi kesalahan: " . $e->getMessage() . "</div>";
+                $checkStmt->close();
             }
+
+            $conn->close();
         ?>
     </div>
 </body>
