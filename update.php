@@ -84,15 +84,15 @@
         <h1 class="text-center mt-5">Ubah Data</h1>
         <form action="" method="post">
             <div class="form-group">
-                <label for="nameInput">Name</label>
-                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Enter Name" required value="<?php echo $result[0]['name'] ?>">
+                <label for="nameInput">Nama</label>
+                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Masukkan Nama Produk" required value="<?php echo $result[0]['name'] ?>">
             </div>
             <div class="form-group">
-                <label for="priceInput">Price</label>
-                <input type="number" class="form-control" id="priceInput" name="price" placeholder="Enter Price" required value="<?php echo $result[0]['price'] ?>">
+                <label for="priceInput">Harga</label>
+                <input type="number" class="form-control" id="priceInput" name="price" placeholder="Masukkan Harga" required value="<?php echo $result[0]['price'] ?>">
             </div>
             <div class="form-group">
-                <label for="categorySelect">Category</label>
+                <label for="categorySelect">Kategori</label>
                 <select class="form-control" id="categorySelect" name="id_category" required>
                     <?php
                         $categories = $conn->query("SELECT id_category, name FROM categories");
@@ -116,11 +116,11 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="stockInput">Stock</label>
-                <input type="number" class="form-control" id="stockInput" name="current_stock" placeholder="Current Stock" readonly value="<?php echo $result[0]['stock'] ?>">
+                <label for="stockInput">Stok</label>
+                <input type="number" class="form-control" id="stockInput" name="current_stock" placeholder="Stok Saat Ini" readonly value="<?php echo $result[0]['stock'] ?>">
             </div>
             <div class="form-group">
-                <label for="addStockInput">Tambah Stock</label>
+                <label for="addStockInput">Tambah Stok</label>
                 <input type="number" class="form-control" id="addStockInput" name="add_stock" placeholder="0" required>
             </div>
 

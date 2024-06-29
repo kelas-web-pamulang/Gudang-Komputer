@@ -113,33 +113,47 @@ $transaction_query = "SELECT t.id, t.product_id, t.quantity, t.buyer_name, t.cre
                       JOIN products p ON t.product_id = p.id
                       WHERE (t.buyer_name LIKE ? OR p.name LIKE ?)";
 
+$total_shopping_query = "SELECT SUM(t.quantity * p.price) AS total_shopping 
+                         FROM transactions t 
+                         JOIN products p ON t.product_id = p.id
+                         WHERE (t.buyer_name LIKE ? OR p.name LIKE ?)";
+
 $search_param = ["%".$search_query."%", "%".$search_query."%"];
 
 if (!empty($start_date) && !empty($end_date)) {
     if ($start_date === $end_date) {
         // If start_date and end_date are the same, ensure the filter includes the whole day
         $transaction_query .= " AND t.created_at BETWEEN ? AND ?";
+        $total_shopping_query .= " AND t.created_at BETWEEN ? AND ?";
         $search_param[] = $start_date . " 00:00:00";
         $search_param[] = $end_date . " 23:59:59";
     } else {
         $transaction_query .= " AND t.created_at >= ? AND t.created_at <= ?";
+        $total_shopping_query .= " AND t.created_at >= ? AND t.created_at <= ?";
         $search_param[] = $start_date . " 00:00:00";
         $search_param[] = $end_date . " 23:59:59";
     }
 } elseif (!empty($start_date)) {
     $transaction_query .= " AND t.created_at >= ?";
+    $total_shopping_query .= " AND t.created_at >= ?";
     $search_param[] = $start_date . " 00:00:00";
 } elseif (!empty($end_date)) {
     $transaction_query .= " AND t.created_at <= ?";
-    $search_param[] = $end_date . " 23:59:59";
+    $total_shopping_query .= " AND t.created_at <= ?";
+    $search_param[] = $end_date . " 00:00:00";
 }
 
+// Add ORDER BY clause at the end of transaction query
+$transaction_query .= " ORDER BY t.created_at DESC";
+
 $stmt = $conn->prepare($transaction_query);
+if ($stmt === false) {
+    die('Prepare failed: ' . htmlspecialchars($conn->error));
+}
 
 // Construct the types string for bind_param
 $types = str_repeat("s", count($search_param));
 $stmt->bind_param($types, ...$search_param);
-
 $stmt->execute();
 $transaction_result = $stmt->get_result();
 $transactions = [];
@@ -148,13 +162,19 @@ while ($row = $transaction_result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Fetch total shopping
-$total_shopping_query = "SELECT SUM(t.quantity * p.price) AS total_shopping FROM transactions t JOIN products p ON t.product_id = p.id";
-$total_shopping_result = $conn->query($total_shopping_query);
+// Fetch total shopping with the same conditions
+$total_stmt = $conn->prepare($total_shopping_query);
+if ($total_stmt === false) {
+    die('Prepare failed: ' . htmlspecialchars($conn->error));
+}
+$total_stmt->bind_param($types, ...$search_param);
+$total_stmt->execute();
+$total_shopping_result = $total_stmt->get_result();
 $total_shopping = 0;
 if ($row = $total_shopping_result->fetch_assoc()) {
     $total_shopping = $row['total_shopping'];
 }
+$total_stmt->close();
 
 $conn->close();
 ?>
@@ -250,6 +270,7 @@ $conn->close();
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
+                    <th>No.</th>
                     <th>ID Transaksi</th>
                     <th>Nama Produk</th>
                     <th>Jumlah</th>
@@ -260,8 +281,10 @@ $conn->close();
             </thead>
             <tbody>
                 <?php if (count($transactions) > 0): ?>
+                    <?php $no = 1; ?>
                     <?php foreach ($transactions as $transaction): ?>
                         <tr>
+                            <td><?php echo $no++; ?></td>
                             <td><?php echo $transaction['id']; ?></td>
                             <td><?php echo $transaction['product_name']; ?></td>
                             <td><?php echo $transaction['quantity']; ?></td>

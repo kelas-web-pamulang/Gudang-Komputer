@@ -52,15 +52,15 @@
         <h1 class="text-center mt-5">Insert Data</h1>
         <form action="" method="post">
             <div class="form-group">
-                <label for="nameInput">Name</label>
-                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Enter Name" required>
+                <label for="nameInput">Nama</label>
+                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Masukkan Nama Produk" required>
             </div>
             <div class="form-group">
-                <label for="priceInput">Price</label>
-                <input type="number" class="form-control" id="priceInput" name="price" placeholder="Enter Price" required>
+                <label for="priceInput">Harga</label>
+                <input type="number" class="form-control" id="priceInput" name="price" placeholder="Masukkan Harga" required>
             </div>
             <div class="form-group">
-                <label for="categoryInput">Category</label>
+                <label for="categoryInput">Kategori</label>
                 <?php
                     $categories = $conn->query("SELECT id_category, name FROM categories");
                     echo "<select class='form-control form-select' id='categoryInput' name='category'>";
@@ -84,8 +84,8 @@
                 ?>
             </div>
             <div class="form-group">
-                <label for="stockInput">Stock</label>
-                <input type="number" class="form-control" id="stockInput" name="stock" placeholder="Enter Stock" required>
+                <label for="stockInput">Stok</label>
+                <input type="number" class="form-control" id="stockInput" name="stock" placeholder="Masukkan Stok" required>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
             <a href="index.php" class="btn btn-success">Kembali</a>

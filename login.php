@@ -52,7 +52,7 @@
         <form action="" method="post">
             <div class="form-group mb-3">
                 <label for="emailInput">Email</label>
-                <input type="email" class="form-control" id="emailInput" name="email" placeholder="Masukkan Email" required>
+                <input type="email" class="form-control" id="emailInput" name="email" placeholder="Masukkan Alamat Email" required>
             </div>
             <div class="form-group mb-3">
                 <label for="passwordInput">Password</label>

@@ -52,7 +52,7 @@
         <form action="" method="post">
             <div class="form-group mb-3">
                 <label for="nameInput">Nama</label>
-                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Masukkan Name" required>
+                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Masukkan Nama" required>
             </div>
             <div class="form-group mb-3">
                 <label for="emailInput">Email</label>
