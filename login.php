@@ -52,7 +52,7 @@
         <form action="" method="post">
             <div class="form-group mb-3">
                 <label for="emailInput">Email</label>
-                <input type="email" class="form-control" id="emailInput" name="email" placeholder="Masukkan Email" required>
+                <input type="email" class="form-control" id="emailInput" name="email" placeholder="Masukkan Alamat Email" required>
             </div>
             <div class="form-group mb-3">
                 <label for="passwordInput">Password</label>
@@ -73,7 +73,7 @@
   // Set a sampling rate for profiling - this is relative to traces_sample_rate
   'profiles_sample_rate' => 1.0,
 ]);
-            ini_set('display_errors', '0');
+            ini_set('display_errors', '1');
             ini_set('display_startup_errors', '1');
             error_reporting(E_ALL);
 
