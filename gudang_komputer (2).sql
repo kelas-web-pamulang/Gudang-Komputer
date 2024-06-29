@@ -147,8 +147,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `email`, `full_name`, `password`, `role`, `created_at`) VALUES
 (1, 'ahmadshowi15@gmail.com', 'ahmad showi', '$2y$10$n6HJ3a3swF.pD0ceGp995.b1sqI1tGsI9hU6gm.p1iVXEyiOiVWz.', 'admin', '2024-06-10 10:18:02'),
-(4, 'ahmadshowi123@gmail.com', 'ahmad showi', '$2y$10$Vl6RPEi8vcJuQRxww7lEVOXDRUHMKc2PnyZ97mWi8e0r12zX3SKQq', 'admin', '2024-06-10 15:25:32'),
-(5, 'Rafiakl@gmail.com', 'rafi', '$2y$10$SRackx/fEnKegN39BwcLCeY5xfQ7vQxqDdvdiMQ/QZFWgR0.LyVQC', 'admin', '2024-06-11 06:18:38');
+(2, 'ahmadshowi123@gmail.com', 'ahmad showi', '$2y$10$Vl6RPEi8vcJuQRxww7lEVOXDRUHMKc2PnyZ97mWi8e0r12zX3SKQq', 'admin', '2024-06-10 15:25:32'),
+(3, 'dafitmtq@gmail.com', 'dafit muttaqin', '$2y$10$SRackx/fEnKegN39BwcLCeY5xfQ7vQxqDdvdiMQ/QZFWgR0.LyVQC', 'admin', '2024-06-11 06:18:38');
 
 --
 -- Indexes for dumped tables
