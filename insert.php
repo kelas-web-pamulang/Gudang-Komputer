@@ -12,20 +12,16 @@
 
     require_once 'vendor/autoload.php';
 
-    \Sentry\init([
-    'dsn' => 'https://8fe5bdc8b306ed66f97ce9fbcb34beed@o4507456514949120.ingest.us.sentry.io/4507456516653056',
-    // Specify a fixed sample rate
-    'traces_sample_rate' => 1.0,
-    // Set a sampling rate for profiling - this is relative to traces_sample_rate
-    'profiles_sample_rate' => 1.0,
-    ]);
-
-ini_set('display_errors', '0');
-            ini_set('display_startup_errors', '1');
-            error_reporting(E_ALL);
+\Sentry\init([
+  'dsn' => 'https://8fe5bdc8b306ed66f97ce9fbcb34beed@o4507456514949120.ingest.us.sentry.io/4507456516653056',
+  // Specify a fixed sample rate
+  'traces_sample_rate' => 1.0,
+  // Set a sampling rate for profiling - this is relative to traces_sample_rate
+  'profiles_sample_rate' => 1.0,
+]);
 
         date_default_timezone_set('Asia/Jakarta');
-        ini_set('display_errors', '0');
+        ini_set('display_errors', '1');
         ini_set('display_startup_errors', '1');
         error_reporting(E_ALL);
 
@@ -56,15 +52,15 @@ ini_set('display_errors', '0');
         <h1 class="text-center mt-5">Insert Data</h1>
         <form action="" method="post">
             <div class="form-group">
-                <label for="nameInput">Name</label>
-                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Enter Name" required>
+                <label for="nameInput">Nama</label>
+                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Masukkan Nama Produk" required>
             </div>
             <div class="form-group">
-                <label for="priceInput">Price</label>
-                <input type="number" class="form-control" id="priceInput" name="price" placeholder="Enter Price" required>
+                <label for="priceInput">Harga</label>
+                <input type="number" class="form-control" id="priceInput" name="price" placeholder="Masukkan Harga" required>
             </div>
             <div class="form-group">
-                <label for="categoryInput">Category</label>
+                <label for="categoryInput">Kategori</label>
                 <?php
                     $categories = $conn->query("SELECT id_category, name FROM categories");
                     echo "<select class='form-control form-select' id='categoryInput' name='category'>";
@@ -88,8 +84,8 @@ ini_set('display_errors', '0');
                 ?>
             </div>
             <div class="form-group">
-                <label for="stockInput">Stock</label>
-                <input type="number" class="form-control" id="stockInput" name="stock" placeholder="Enter Stock" required>
+                <label for="stockInput">Stok</label>
+                <input type="number" class="form-control" id="stockInput" name="stock" placeholder="Masukkan Stok" required>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
             <a href="index.php" class="btn btn-success">Kembali</a>
